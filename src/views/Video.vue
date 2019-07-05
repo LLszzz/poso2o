@@ -87,7 +87,7 @@
 						<span>综合评分 4.85</span>
 					</div>					
 				</div>
-				<div>进店逛逛</div>
+				<div @click="$router.push({path:'/Shop'})">进店逛逛</div>
 			</div>
 			<div class="shop_commodity">
 				<div><img src="../assets/img/6.jpg"/></div>

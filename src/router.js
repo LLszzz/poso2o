@@ -35,6 +35,21 @@ export default new Router({
     	path:"/Video",
     	name:"Video",
     	component:()=>import("@/views/Video.vue")
+    },
+    {
+    	path:"/Shop",
+    	name:"Shop",
+    	component:()=>import("@/views/Shop.vue")
+    },
+    {
+    	path:"/personal/ChangePhone",
+    	name:"ChangePhone",
+    	component:()=>import("@/views/personal/ChangePhone.vue")
+    },
+    {
+    	path:"/personal/OrderList",
+    	name:"OrderList",
+    	component:()=>import("@/views/personal/OrderList.vue")
     }
   ]
 })

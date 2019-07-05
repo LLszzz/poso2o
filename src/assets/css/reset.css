@@ -1,6 +1,6 @@
 @charset "utf-8";
-body,p,ul,ol,li,dl,dt,dd,h1,h2,h3,h4,h5,h6,form,fieldset,legend,input,select,textarea,button,th,td,menu{margin:0;padding:0;}
-*{box-sizing:border-box}
+body,p,ul,ol,li,dl,dt,dd,h1,h2,h3,h4,h5,h6,form,fieldset,legend,input,select,textarea,button,th,td,menu{margin:0;padding:0;box-sizing: border-box;}
+*{box-sizing:border-box;font-size: .32rem}
 header,nav,footer,section{display: block;}
 ul,dl,ol{list-style:none;}
 img,fieldset,input[type="submit"]{border:0 none;}
@@ -29,3 +29,4 @@ body {height: 100%;margin: 0;position: relative;}
     display: block;
     clear: both;
 }
+input{border: none;}
