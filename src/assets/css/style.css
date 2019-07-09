@@ -1039,6 +1039,10 @@
     padding: .2rem;
 }
 
+.p0-20{
+    padding: 0 .2rem;
+}
+
 .displyIB {
     display: inline-block;
 }
@@ -1083,19 +1087,51 @@
     display: inline-block;
 }
 
+.pb-10 {
+    padding-bottom: .1rem;
+}
+
+.pt-10 {
+    padding-top: .1rem;
+}
+
 .pb-20 {
     padding-bottom: .2rem;
+}
+
+.pt-20 {
+    padding-top: .2rem;
+}
+
+.pl-20 {
+    padding-left: .2rem;
+}
+
+.pr-20 {
+    padding-right: .2rem;
+}
+
+.pr-80{
+    padding-right: .8rem;
 }
 
 .pb-0 {
     padding-bottom: 0;
 }
 
-.srcollY {
+.pt-0 {
+    padding-top: 0;
+}
+
+.scrollY {
     overflow-y: auto;
 }
 
 /**项目专用**/
+.h20{
+    height: .2rem;
+}
+
 body {
     background-color: #F0F8FF;
 }
@@ -1117,6 +1153,18 @@ body {
 
 .fontGray {
     color: #9b9b9b;
+}
+
+.fontGray {
+    color: #9b9b9b;
+}
+
+.fontRed {
+    color: #ff3300;
+}
+
+.fontYellow{
+    color: #FFFF00;
 }
 
 .bgWhite {
@@ -1144,7 +1192,15 @@ body {
 }
 
 .borderBottomGray {
-    border-bottom: .02rem solid #dddddd;
+    border-bottom: .02rem solid #eeeeee;
+}
+
+.borderRightGray {
+    border-right: .02rem solid #eeeeee;
+}
+
+.borderTopGray {
+    border-top: .02rem solid #eeeeee;
 }
 
 .squarePhoto {
@@ -1185,3 +1241,9 @@ body {
 .mb20 {
     margin-bottom: .2rem;
 }
+
+.emojiForChat{
+    width: 0.5rem;
+    height: 0.5rem;
+    vertical-align: middle;
+  }

@@ -16,9 +16,9 @@
 </script>
 
 <style lang="scss">
-	@import url("//at.alicdn.com/t/font_1275272_gcv8nc3z1r4.css");
-	@import url('assets/css/style.css');
 	@import url("assets/css/reset.css");
+	@import url("//at.alicdn.com/t/font_1275272_myuedm3b9uo.css");
+	@import url('assets/css/style.css');
 	html,body,#app{
 		width: 100vw;
 		height:100vh;

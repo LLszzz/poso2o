@@ -357,7 +357,7 @@
 						border:1px solid #9D9D9D ;
 						box-sizing: border-box;
 						>span{
-							width: 33%;
+							width: 32%;
 							text-align: center;
 							display: inline-block;
 						}

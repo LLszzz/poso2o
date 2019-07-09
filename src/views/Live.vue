@@ -23,76 +23,21 @@
 	  		</ul>
 	  	</div>
 	  	<div class="content" v-if="Sel==1" >
-	  		<div class="content_Live" @click="$router.push({path:'/Video'})">
-	  			<div class="img">
-	  				<img src="../assets/img/1.jpg"/>
-	  				<span>新人主播求关注！</span>
-	  				<span>200个人在看</span>
+	  		
+	  		<div class="content_Live" @click="$router.push({path:'/Video',query:{play_id:val.play_id}})" v-for="(val,index) in list">
+	  			<div class="img squarePhoto" :style="'background: url('+val.play_logo+');'">
+	  				<span>{{val.play_title}}</span>
+	  				<span>{{val.toponline_count}}个人在看</span>
 	  			</div>
 	  			<div class="Details">
 	  				<div>
-	  					<div class="HeadImage"><img src="../assets/img/1.jpg"/></div>
-	  					<p>一只小可爱啊</p>
+	  					<div class="HeadImage"><img :src="val.shop_logo"/></div>
+	  					<p>{{val.shop_name}}</p>
 	  				</div>
-	  				<i class="iconfont icon-weizhi">沈阳</i>
+	  				<i class="iconfont icon-weizhi">{{val.province_name}}</i>
 	  			</div>
 	  		</div>
-	  		<div class="content_Live">
-	  			<div class="img">
-	  				<img src="../assets/img/1.jpg"/>
-	  				<span>新人主播求关注！</span>
-	  				<span>200个人在看</span>
-	  			</div>
-	  			<div class="Details">
-	  				<div>
-	  					<div class="HeadImage"><img src="../assets/img/1.jpg"/></div>
-	  					<p>一只小可爱啊</p>
-	  				</div>
-	  				<i class="iconfont icon-weizhi">沈阳</i>
-	  			</div>
-	  		</div>
-	  		<div class="content_Live">
-	  			<div class="img">
-	  				<img src="../assets/img/1.jpg"/>
-	  				<span>新人主播求关注！</span>
-	  				<span>200个人在看</span>
-	  			</div>
-	  			<div class="Details">
-	  				<div>
-	  					<div class="HeadImage"><img src="../assets/img/1.jpg"/></div>
-	  					<p>一只小可爱啊</p>
-	  				</div>
-	  				<i class="iconfont icon-weizhi">沈阳</i>
-	  			</div>
-	  		</div>
-	  		<div class="content_Live">
-	  			<div class="img">
-	  				<img src="../assets/img/1.jpg"/>
-	  				<span>新人主播求关注！</span>
-	  				<span>200个人在看</span>
-	  			</div>
-	  			<div class="Details">
-	  				<div>
-	  					<div class="HeadImage"><img src="../assets/img/1.jpg"/></div>
-	  					<p>一只小可爱啊</p>
-	  				</div>
-	  				<i class="iconfont icon-weizhi">沈阳</i>
-	  			</div>
-	  		</div>
-	  		<div class="content_Live">
-	  			<div class="img">
-	  				<img src="../assets/img/1.jpg"/>
-	  				<span>新人主播求关注！</span>
-	  				<span>200个人在看</span>
-	  			</div>
-	  			<div class="Details">
-	  				<div>
-	  					<div class="HeadImage"><img src="../assets/img/1.jpg"/></div>
-	  					<p>一只小可爱啊</p>
-	  				</div>
-	  				<i class="iconfont icon-weizhi">沈阳</i>
-	  			</div>
-	  		</div>
+	  		
 	  	</div>
   	</div>
   	
@@ -326,10 +271,6 @@
 		width: 100%;
 		height: 80%;
 		position: relative;
-		>img{
-			width: 100%;
-			height: 100%;
-		}
 		>span{
 			transform: scale(0.8);
 			position: absolute;
@@ -363,7 +304,7 @@
 		}
 		
 		>i{
-			font-size: 14px;
+			font-size: 12px;
 		}
 	}
 	.HeadImage{
@@ -387,20 +328,24 @@ export default {
 	data(){
 		return{
 			TopBar:1,
-			Sel:1
+			Sel:1,
+			list:[],
 		}
 	},
 	methods:{
 		getList(){
-//			this.$require.get("http://wechat.poso2o.com/UserAddressManage.htm?Act=list",{
-//				params:{
-//					app_openid:"wx9accca47f099b162"
-//				}
-//			}).then((res)=>{
-//				console.log(res);
-//			}).catch(err=>{
-//				console.log(err);
-//			})
+			this.$require.get("http://wechat.poso2o.com/SmallPlayManage.htm?Act=query",{
+				params:{
+					app_openid:"wx9accca47f099b162",
+					currPage:1
+				}
+			}).then((res)=>{
+				console.log(res);
+				this.list = res.data.data.list;
+				console.log(this.list)
+			}).catch(err=>{
+				console.log(err);
+			})
 		},
 		Close(){
 			

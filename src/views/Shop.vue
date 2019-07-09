@@ -1,13 +1,14 @@
 <template>
 	<div class="Shop">
 		<div class="top">
-			<i class="iconfont icon-fanhui"></i>
-			<input type="text" name="" id="" value="" placeholder="商品" />
+			<i class="iconfont icon-fanhui" @click="$router.go(-1)"></i>
+			<input v-model="keywords" @input="getList()" type="text" name="" id="" value="" placeholder="商品" />
 		</div>
-		<div class="content" v-if="tabBar==1">
+		
+		<!--首页-->
+		<!--<div class="content"  >
 			<div>
 				<swiper :options="swiperOption" >
-				    <!-- slides -->
 				    <swiper-slide><img src="../assets/img/1.png"/></swiper-slide>
 				    <swiper-slide><img src="../assets/img/1.png"/></swiper-slide>
 				    <swiper-slide><img src="../assets/img/1.png"/></swiper-slide>
@@ -91,23 +92,68 @@
 				<p>纯棉T恤</p>
 				<span>￥299.00</span>
 			</div>
+		</div>-->
+		
+		<div class="content_shop" v-if="tabBar==1" >
+			<div class="content_shop_sel">
+				<ul>
+					<li @click="orderByName='goods_sale_number';getList();sort=''" :class="orderByName=='goods_sale_number'?'active':''">销量</li>
+					<li @click="orderByName='build_time';getList();sort=''" :class="orderByName=='build_time'?'active':''">新品</li>
+					<li @click="sort=isSort?'ASC':'DESC';isSort=!isSort;orderByName='';getList()" :class="orderByName==''?'active':''">
+						<p>价格</p>
+						<div>
+							<p class="iconfont icon-shang" :class="sort=='ASC'?'active':'noActive'"></p>
+							<p class="iconfont icon-xia" :class="sort=='DESC'?'active':'noActive'"></p>
+						</div>
+					</li>
+					<li>
+						<div>
+							<i class="iconfont icon-caidan1"></i>
+						</div>
+						<div>
+							<p>筛选</p>
+							<i class="iconfont icon-shaixuan"></i>
+						</div>
+					</li>
+				</ul>
+			</div>
+			<div class="content_shop_list" id="content_shop_list"  @scroll="scroll">
+				<div @click="$router.push({path:'/ShopDetails',query:{shop_id:val.shop_id,goods_id:val.goods_id}})" v-for="(val,index) in list">
+					<div class="squarePhoto" :style="'background-image:url('+val.main_picture+')'"></div>
+					<div>
+						<p class="onlyTwoLine">{{val.goods_name}}</p>
+						<div>
+							<span>￥{{val.price}}</span>
+							<span>{{val.goods_sale_number}}人购买</span>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 		<div class="bottom">
 			<ul>
-				<li @click="tabBar=1" :class="tabBar==1?'active_bottom':''">
+				<li @click="PageJump()">
 					<i class="iconfont icon-shouye"></i>
 					<p>首页</p>
 				</li>
-				<li  @click="tabBar=2" :class="tabBar==2?'active_bottom':''">
+				<li  @click="tabBar=1" :class="tabBar==1?'active_bottom':''">
 					<i class="iconfont icon-gouwudai"></i>
 					<p>商品</p>
 				</li>
-				<li  @click="tabBar=3" :class="tabBar==3?'active_bottom':''">
+				<li>
 					<i class="iconfont icon-liaotian"></i>
 					<p>客服</p>
 				</li>
 			</ul>
 		</div>
+		
+		<div class="Toast" v-if="isToast">
+			<div>
+				<i class="iconfont icon-jiazai"></i>
+				<p>加载更多</p>
+			</div>
+		</div>
+		
 	</div>
 </template>
 
@@ -116,16 +162,208 @@
 		data(){
 			return{
 				tabBar:1,
+				list:[],
+				keywords:"",
+				shop_id:this.$route.query.shop_id,
+				orderByName:"goods_sale_number",
+				isSort:false,
+				sort:"",
+				page:1,
+				isPage:true,
+				arr:[],
+				isToast:false,
 				swiperOption: {
 					autoplay:true,
-					loop:true
+					loop:true,
         		}
 			}
+		},
+		methods:{
+			getList(){
+				this.$require.get("http://wechat.poso2o.com/OpenGoodsManage.htm?Act=query",{
+					params:{
+						app_openid:"wx9accca47f099b162",
+						shop_id:this.shop_id,
+						keywords:this.keywords,
+						orderByName:this.orderByName,
+						sort:this.sort,
+						page:this.page,
+					}
+				}).then((res)=>{
+					this.list = this.arr.concat(res.data.data.list);
+					this.arr = [];
+					console.log(this.list)
+					setTimeout(()=>{
+					this.isPage  = true;
+						
+						this.isToast = false;
+					},1000)
+					
+				}).catch(err=>{
+					console.log(err);
+				})
+			},
+			PageJump(){
+				window.location.href = 'http://wechattest.poso2o.com/wxshop/shop_template/index_13824597674.jsp?shop_id='+this.shop_id+'&app_from=live_h5'
+			},
+			scroll(){
+				var t = document.querySelector(".content_shop_list").scrollTop;
+				if(this.isPage && t>document.querySelector(".content_shop_list").scrollHeight-600){
+					this.list.forEach((val)=>{
+						this.arr.push(val);
+					});
+					this.isPage  = false;
+					this.page++;
+					this.getList();
+					this.isToast = true;
+				}
+			}
+		},
+		created(){
+			this.getList();
+		},
+		mounted(){
+
 		}
+		
 	}
 </script>
 
 <style lang="scss" scoped="scoped">
+	@keyframes move{
+		from{transform: rotate(0deg);}
+		to{transform:rotate(360deg);}
+	}
+	.Toast{
+		width: 100vw;
+		height: 100vh;
+		position: fixed;
+		top:0;
+		left: 0;
+		>div{
+			width:30vw;
+			height: 30vw;
+			position: absolute;
+			border-radius:4vw ;
+			left: 50%;
+			top: 50%;
+			transform: translate(-50%,-50%);
+			background: rgba(0,0,0,0.8);
+			color: white;
+			display: flex;
+			justify-content: center;
+			align-content: center;
+			flex-wrap:wrap ;
+			>i{
+				animation: move 1s infinite linear;
+			}
+			>p{
+				margin-top: 1vh;
+				width: 100%;
+				text-align: center;
+			}
+		}
+	}
+	.noActive{
+		color: black;
+	}
+	.active{
+		color:#ff4146 ;
+	}
+	.content{
+		width: 100vw;
+		height:92vh;
+	}
+	.content_shop_list{
+		width: 100%;
+		height: 76vh;
+		overflow: hidden;
+		overflow-y: scroll;
+		>div{
+			display: inline-block;
+			margin: 0 1vw;
+			margin-bottom: 0.5vh;
+			width: 48vw;
+			height: 38vh;
+			border-radius:2vw ;
+			background: white;
+			overflow: hidden;
+			>div:nth-of-type(1){
+				width: 100%;
+				height:70%;
+			}
+			>div:nth-of-type(2){
+				width: 100%;
+				height: 30%;
+				display: flex;
+				flex-direction:column;
+				justify-content: space-between;
+				padding:1vh 4vw;
+				box-sizing: border-box;
+				>p{
+					font-size: 14px;
+				}
+				>div{
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					>span:nth-of-type(1){
+						color: #e2774f;
+						font-size: 16px;
+					}
+					>span:nth-of-type(2){
+						font-size: 12px;
+						color: #a0a0a0;
+					}
+				}
+			}
+		}
+	}
+	.content_shop_sel{
+		width: 100%;
+		overflow: hidden;
+		height: 7vh;
+		background: white;
+		margin:0.5vh 0;
+		>ul{
+			display: flex;
+			justify-content:space-around;
+			>li{
+				height: 7vh;
+				text-align: center;
+				display: flex;
+				align-items: center;
+				font-size: 14px;
+			}
+			>li:nth-of-type(3){
+				>p{
+					font-size: 14px;
+				}
+				>div{
+					>p{
+						font-size: 12px;
+					}
+				}
+			}
+			>li:nth-of-type(4){
+				i{
+					font-size: 24px;
+				}
+				>div:nth-of-type(1){
+					padding-right: 2vw;
+				}
+				>div:nth-of-type(2){
+					border-left:2px solid #eaeaea ;
+					padding-left: 2vw;
+					display: flex;
+					align-items: center;
+					>p{
+						font-size: 14px;
+					}
+				}
+			}
+		}
+	}
 	.active_bottom{
 		>i{
 			color: #ff4146;	
@@ -140,6 +378,7 @@
 		position: absolute;
 		bottom: 0;
 		left: 0;
+		background: white;
 		>ul{
 			width: 100%;
 			display: flex;
@@ -201,8 +440,7 @@
 		}
 	}
 	.content{
-		width: 100%;
-		height: 84vh;
+		/*width: 100%;
 		overflow: hidden;
 		overflow-y: scroll;
 		>div:nth-of-type(1){
@@ -210,7 +448,7 @@
 			img{
 				width: 100%;
 			}
-		}
+		}*/
 	}
 	.tab{
 		width: 100%;
