@@ -1,6 +1,6 @@
 <template>
 	<div class="Shop">
-		<div class="top">
+		<div class="top" v-if="tabBar!=1">
 			<i class="iconfont icon-fanhui" @click="$router.go(-1)"></i>
 			<input v-model="keywords" @input="getList()" type="text" name="" id="" value="" placeholder="商品" />
 		</div>
@@ -93,8 +93,10 @@
 				<span>￥299.00</span>
 			</div>
 		</div>-->
-		
-		<div class="content_shop" v-if="tabBar==1" >
+		<!--<div v-if="tabBar==1" class="iframe" >
+			<iframe src="http://wechattest.poso2o.com/wxshop/shop_template/index_13824597674.jsp?shop_id='+this.shop_id+'&app_from=live_h5" width="" height=""></iframe>
+		</div>-->
+		<div class="content_shop" v-if="tabBar==2" >
 			<div class="content_shop_sel">
 				<ul>
 					<li @click="orderByName='goods_sale_number';getList();sort=''" :class="orderByName=='goods_sale_number'?'active':''">销量</li>
@@ -132,11 +134,11 @@
 		</div>
 		<div class="bottom">
 			<ul>
-				<li @click="PageJump()">
+				<li @click="PageJump()" >
 					<i class="iconfont icon-shouye"></i>
 					<p>首页</p>
 				</li>
-				<li  @click="tabBar=1" :class="tabBar==1?'active_bottom':''">
+				<li  @click="tabBar=2" :class="tabBar==2?'active_bottom':''">
 					<i class="iconfont icon-gouwudai"></i>
 					<p>商品</p>
 				</li>
@@ -161,7 +163,7 @@
 	export default {
 		data(){
 			return{
-				tabBar:1,
+				tabBar:2,
 				list:[],
 				keywords:"",
 				shop_id:this.$route.query.shop_id,
@@ -172,17 +174,28 @@
 				isPage:true,
 				arr:[],
 				isToast:false,
+				open_id:"oaERPuCpXCiAkrXjE26qKh0FaMF0",
 				swiperOption: {
 					autoplay:true,
 					loop:true,
         		}
+				
 			}
 		},
 		methods:{
 			getList(){
+				var url = window.location.href;
+				console.log(url)
+				var str = url.split("?");
+				var arr = str[1].split("&");
+				for(let i=0;i<arr.length;i++){
+					if(arr[i].split("=")[0] == "open_id"){
+						this.open_id = arr[i].split("=")[1];
+					}
+				}
 				this.$require.get("http://wechat.poso2o.com/OpenGoodsManage.htm?Act=query",{
 					params:{
-						app_openid:"wx9accca47f099b162",
+						app_openid:this.open_id,
 						shop_id:this.shop_id,
 						keywords:this.keywords,
 						orderByName:this.orderByName,
@@ -204,7 +217,7 @@
 				})
 			},
 			PageJump(){
-				window.location.href = 'http://wechattest.poso2o.com/wxshop/shop_template/index_13824597674.jsp?shop_id='+this.shop_id+'&app_from=live_h5'
+				window.location.href = 'http://wechattest.poso2o.com/wxshop/shop_template/index_13824597674.jsp?shop_id='+this.shop_id+'app_openid='+this.open_id+'&app_from=live_h5'
 			},
 			scroll(){
 				var t = document.querySelector(".content_shop_list").scrollTop;
@@ -230,6 +243,15 @@
 </script>
 
 <style lang="scss" scoped="scoped">
+	.iframe{
+		width: 100%;
+		height: 92vh;
+		>iframe{
+			width: 100%;
+			height: 92vh;
+			border: none;
+		}
+	}
 	@keyframes move{
 		from{transform: rotate(0deg);}
 		to{transform:rotate(360deg);}

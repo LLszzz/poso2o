@@ -41,34 +41,40 @@ export default new Router({
     	name:"Shop",
     	component:()=>import("@/views/Shop.vue")
     },
+//  {
+//  	path:"/personal/ChangePhone",
+//  	name:"ChangePhone",
+//  	component:()=>import("@/views/personal/ChangePhone.vue")
+//  },
+//  {
+//  	path:"/personal/OrderList",
+//  	name:"OrderList",
+//  	component:()=>import("@/views/personal/OrderList.vue")
+//  },
+//  {
+//  	path:"/ShopDetails",
+//  	name:"ShopDetails",
+//  	component:()=>import("@/views/shop/ShopDetails.vue")
+//  },
+//  {
+//  	path:"/ShopComment",
+//  	name:"ShopComment",
+//  	component:()=>import("@/views/shop/ShopComment.vue")
+//  },
+//  {
+//  	path:"/Hint",
+//  	name:"Hint",
+//  	component:()=>import("@/views/Hint/Hint.vue")
+//  },
+//  {
+//  	path:"/Service",
+//  	name:"Service",
+//  	component:()=>import("@/views/Service.vue")
+//  },
     {
-    	path:"/personal/ChangePhone",
-    	name:"ChangePhone",
-    	component:()=>import("@/views/personal/ChangePhone.vue")
-    },
-    {
-    	path:"/personal/OrderList",
-    	name:"OrderList",
-    	component:()=>import("@/views/personal/OrderList.vue")
-    },
-    {
-    	path:"/ShopDetails",
-    	name:"ShopDetails",
-    	component:()=>import("@/views/shop/ShopDetails.vue")
-    },
-    {
-    	path:"/ShopComment",
-    	name:"ShopComment",
-    	component:()=>import("@/views/shop/ShopComment.vue")
-    },{
-    	path:"/Hint",
-    	name:"Hint",
-    	component:()=>import("@/views/Hint/Hint.vue")
-    },
-    {
-    	path:"/Service",
-    	name:"Service",
-    	component:()=>import("@/views/Service.vue")
+    	path:"/Complaints",
+    	name:"Complaints",
+    	component:()=>import("@/views/Complaints/Complaints.vue")
     }
   ]
 })

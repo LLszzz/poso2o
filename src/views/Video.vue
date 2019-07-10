@@ -2,16 +2,19 @@
   <!--播放页面-->
   <div class="Video" style="background:black">
     <div class="live" @click="isShop=false">
+    	<!--<video  class="video-js" id="myVideo">
+        	<source :src="liveInfo.replay_url==''?liveInfo.play_url:liveInfo.replay_url" type="application/x-mpegURL">
+      	</video>-->
       <video
+      	id="video"
         :width="width"
         :height="height"
+        preload="auto"
         webkit-playsinline="true"
-        x5-video-player-type="h5"
-        x5-video-player-fullscreen="true"
         playsinline="true"
         autoplay="autoplay"
       >
-        <source :src="liveInfo.replay_url==''?liveInfo.play_url:liveInfo.replay_url" type="video/mp4" />
+        <source src="http://live-paltform.oss-cn-shanghai.aliyuncs.com/record/poso2o/190710146085662/2019-07-10-14-43-17_2019-07-10-14-43-50.mp4" type="video/mp4" />
         <object type="application/x-shockwave-flash" data="myvideo.swf">
           <param name="movie" value="myvideo.swf" />
           <param name="flashvars" value="autostart=true&amp;file=myvideo.swf" />
@@ -19,10 +22,11 @@
         当前浏览器不支持 video直接播放，点击这里下载视频：
         <a href="myvideo.webm">下载视频</a>
       </video>
+      <!--<ali-player isLive="true" autoplay="true" aliplayerSdkPath="//g.alicdn.com/de/prismplayer/2.1.0/aliplayer-min.js" :source="liveInfo.replay_url==''?liveInfo.play_url:liveInfo.replay_url"  ></ali-player>-->
       <!--<ali-player ></ali-player>-->
     </div>
     <div class="top">
-      <div @click="$router.push({path:'/Shop',query:{shop_id:liveInfo.shop_id}})">
+      <div @click="jump(liveInfo.shop_id)">
         <div>
           <img :src="liveInfo.shop_logo" />
         </div>
@@ -37,7 +41,7 @@
         <span v-if="liveInfo.has_flow==0" class="iconfont icon-chakantieziguanzhu">关注</span>
         <span v-else>已关注</span>
       </div>
-      <i class="iconfont icon-fork" @click="$router.push({path:'/'})"></i>
+      <i class="iconfont icon-fork" @click="wx.closeWindow()"></i>
     </div>
     <div class="left">
       <div>
@@ -46,7 +50,7 @@
         <p>亲密度待领取</p>
         <i class="iconfont icon-jiantou1"></i>-->
       </div>
-      <div style="height:40vh">
+      <div >
         <!-- <div>
           <h4>喜讯61进店福利</h4>
           <p>INFORMATION</p>
@@ -62,9 +66,9 @@
           <div>上方关注芳芳哦</div>
         </div>-->
       </div>
-      <div>
+      <div v-show="isenter">
         <i class="iconfont icon-tubiaolunkuo-"></i>
-        <span>W********8真正去买</span>
+        <span>{{enter}}</span>
       </div>
       <div ref="chatBox">
         <div>
@@ -94,8 +98,8 @@
         v-model="placeholder"
         placeholder="跟主播聊什么"
       />
-      <i class="iconfont icon-gengduo"></i>
-      <i class="iconfont icon-fanhui1"></i>
+      <i class="iconfont icon-gengduo" @click="$router.push({path:'/Complaints',query:{shop_id:_data.liveInfo.shop_id,shop_name:_data.liveInfo.shop_name,open_id:openid}})"></i>
+      <i class="iconfont icon-fanhui1" @click="isShare=true"></i>
       <i @click="likeFun" class="iconfont icon-aixin1" :class="liveInfo.has_like==0?'':'active'"></i>
       <span @click="likeFun" class="likePeople">{{liveInfo.like_count}}</span>
     </div>
@@ -110,7 +114,7 @@
             <span>综合评分 无字段</span>
           </div>
         </div>
-        <div @click="$router.push({path:'/Shop',query:{shop_id:liveInfo.shop_id}})">进店逛逛</div>
+        <div @click="jump(liveInfo.shop_id)">进店逛逛</div>
       </div>
       <div style="height:45vh;overflow-y:auto">
         <div v-for="item in liveInfo.play_goods" class="shop_commodity">
@@ -184,16 +188,25 @@
               <p>联系</p>
             </div>
           </div>
-          <span style="background: #FF5101;">加入购物车</span>
-          <span style="background: red;">立即购买</span>
+          <span style="background: #FF5101;" @click="jump(liveInfo.shop_id)">加入购物车</span>
+          <span style="background: red;" @click="jump(liveInfo.shop_id)">立即购买</span>
         </div>
       </div>
+    </div>
+    <div class="Share" v-if="isShare">
+    	<div>
+    		<span class="iconfont icon-fork" @click="isShare=false"></span>
+    		<i class="iconfont icon-jiantou_youshang"></i>
+    	</div>
+    	<p>点击右上角分享给朋友</p>
+    </div>
+    <div class="button" @click="play()" v-if="isPlay">
+    	<i class="iconfont icon-bofang1"></i>
     </div>
   </div>
 </template>
 
 <script>
-import VueAliplayer from "vue-aliplayer";
 import Chatroom from "@/assets/js/NIM_Web_Chatroom_v6.6.0.js";
 import { all } from "q";
 import { constants } from "crypto";
@@ -202,7 +215,8 @@ export default {
   data() {
     return {
       openid: "oaERPuCpXCiAkrXjE26qKh0FaMF0",
-      play_id: "190709115435477",
+      play_id: "190710146085662",
+      enter:"xxxxxx进入直播间",
       width: 0,
       height: 0,
       placeholder: "",
@@ -211,6 +225,9 @@ export default {
       Quantity: 1,
       chatroom: "",
       msgList: [],
+      isenter:false,
+      isShare:false,
+      isPlay:true,
       liveInfo: {
         play_goods: []
       },
@@ -222,6 +239,8 @@ export default {
       has_collect:0
     };
   },
+  components:{
+  },
   methods: {
     getSize() {
       var width = document.body.offsetWidth;
@@ -232,7 +251,8 @@ export default {
     goService(){
       let that=this;
       that._data.chatroom.disconnect()
-      this.$router.push({path:'/Service',query:{shop_id:that._data.liveInfo.shop_id}})
+//    this.$router.push({path:'/Service',query:{shop_id:that._data.liveInfo.shop_id}})
+			window.location.href='http://wechattest.poso2o.com/wxshop/im/im.jsp?shop_id='+that._data.liveInfo.shop_id+"&open_id="+that.openid;
     },
     getGoodsDetail(goods_id) {
       let that = this;
@@ -546,7 +566,15 @@ export default {
         }).catch((err) => {
           
         });
+    },
+    jump(shop_id){
+    	window.location.href = 'http://wechattest.poso2o.com/wxshop/shop_template/index_13824597674.jsp?shop_id='+shop_id+'&app_from=live_h5';
+    },
+    play(){
+    	document.getElementById("video").play();
+    	this.isPlay = false;
     }
+    
   },
   mounted() {
     let that = this;
@@ -559,10 +587,13 @@ export default {
         }
       })
       .then(res => {
+      	console.log(res.data.data)
         let data = res.data.data;
         //渲染数据
         that._data.liveInfo = data;
         that._data.play_url = data.play_url;
+				document.title = this.liveInfo.shop_name;
+        
         //链接网易云信
         that._data.chatroom = new Chatroom({
           appKey: "68bbcb2de458d1e283dd406024bed0e3",
@@ -605,6 +636,14 @@ export default {
         }
         function onChatroomMsgs(msgs) {
           console.log("收到聊天室消息", msgs);
+          if(msgs[0].text==""){
+          	that.enter = msgs[0].from[0]+"******"+msgs[0].from[msgs[0].from.length-1]+"进入直播间";
+          	that.isenter = true;
+	          setTimeout(()=>{
+	          	that.isenter = false
+	          },1000)
+          }
+          
           let msgList = that._data.msgList;
           let newMsgList = [];
           for (let i of msgs) {
@@ -618,18 +657,89 @@ export default {
             that.$refs.chatBox.scrollTop = msgList.length * 100;
           }, 100);
         }
+        var netType = getNetType(),
+       platformType = getPlatformType();
+ 
+   			if(netType == 'WIFI'){
+       		if(platformType != 'wechat'){
+　　　　　　　		document.getElementById('video').play();//非微信内没有限制，直接触发播放视频
+　　　　			}
+　　　　			wx.ready(function(){//微信内，必须需要等到wx jsapi加载完成之后才能执行播放视频的动作
+           	document.getElementById('video').play();
+　　　　　　			//为防止开播失败，尝试在8s内不断请求开播
+           	var myVid=document.getElementById("video");
+           	var _now_time = Date.now();
+ 
+           	var play_interval = setInterval(function(){
+               var _new_time = Date.now();
+               if(_new_time - _now_time < 8000 && myVid.played.length == 1){
+                   document.getElementById('video').play();
+                   clearInterval(play_interval);
+               }
+               if(_new_time - _now_time >= 8000){
+                   clearInterval(play_interval);
+               }
+           	},200);
+       		})
+				}
       })
       .catch(err => {
         console.log(err);
       });
   },
   components: {
-    "ali-player": VueAliplayer
   }
 };
 </script>
 
 <style scoped="scoped" lang="scss">
+.button{
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%,-50%);
+	width: 30vw;
+	height: 30vw;
+	background: rgba(0,0,0,0.3);
+	border-radius:50% ;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	>i{
+		font-size: 48px;
+		color: white;
+	}
+}
+.Share{
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 120;
+	color: white;
+	background:rgba(0,0,0,0.4);
+	>div{
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		>span{
+			margin-left: 5vw;
+			font-size: 36px;
+		}
+		>i{
+			font-size: 120px;
+		}
+	}
+	>p{
+		margin-top: 5vh;
+		text-align: center;
+		font-size: 24px;
+	}
+}
+.video-js{
+	width: 100%;
+}
 input::-webkit-input-placeholder,
 textarea::-webkit-input-placeholder {
   color: #fff;
@@ -972,7 +1082,7 @@ textarea:-ms-input-placeholder {
 }
 .left {
   position: absolute;
-  top: 9vh;
+  bottom: 10vh;
   left: 0;
   padding: 0 4vw;
   box-sizing: border-box;
