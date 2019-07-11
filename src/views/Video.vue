@@ -1,18 +1,13 @@
 <template>
   <!--播放页面-->
   <div class="Video" style="background:black">
-    <div class="live" @click="isShop=false">
-    	<!--<video  class="video-js" id="myVideo">
-        	<source :src="liveInfo.replay_url==''?liveInfo.play_url:liveInfo.replay_url" type="application/x-mpegURL">
-      	</video>-->
+    <div class="live" @click="isShop=false"   >
       <video
       	id="video"
         :width="width"
         :height="height"
         preload="auto"
-        webkit-playsinline="true"
-        playsinline="true"
-        autoplay="autoplay"
+        x5-video-player-type="web"
       >
         <source src="http://live-paltform.oss-cn-shanghai.aliyuncs.com/record/poso2o/190710146085662/2019-07-10-14-43-17_2019-07-10-14-43-50.mp4" type="video/mp4" />
         <object type="application/x-shockwave-flash" data="myvideo.swf">
@@ -22,8 +17,6 @@
         当前浏览器不支持 video直接播放，点击这里下载视频：
         <a href="myvideo.webm">下载视频</a>
       </video>
-      <!--<ali-player isLive="true" autoplay="true" aliplayerSdkPath="//g.alicdn.com/de/prismplayer/2.1.0/aliplayer-min.js" :source="liveInfo.replay_url==''?liveInfo.play_url:liveInfo.replay_url"  ></ali-player>-->
-      <!--<ali-player ></ali-player>-->
     </div>
     <div class="top">
       <div @click="jump(liveInfo.shop_id)">
@@ -38,7 +31,7 @@
         </div>
       </div>
       <div @click="flowFun">
-        <span v-if="liveInfo.has_flow==0" class="iconfont icon-chakantieziguanzhu">关注</span>
+        <span v-if="liveInfo.has_flow==0" ><i class="iconfont icon-chakantieziguanzhu"></i>关注</span>
         <span v-else>已关注</span>
       </div>
       <i class="iconfont icon-fork" @click="wx.closeWindow()"></i>
@@ -79,12 +72,12 @@
           </p>
         </div>
       </div>
-      <div v-if="liveInfo.play_goods.length>0">
+      <div v-if="liveInfo.play_goods.length>0" @click="jump(liveInfo.shop_id)">
         <div>
           <img :src="liveInfo.play_goods[0].main_picture" />
         </div>
         <div>
-          <p>{{liveInfo.play_goods[0].goods_name}}</p>
+          <p class="onlyOneLine">{{liveInfo.play_goods[0].goods_name}}</p>
           <span>￥{{liveInfo.play_goods[0].price}}</span>
         </div>
       </div>
@@ -99,9 +92,9 @@
         placeholder="跟主播聊什么"
       />
       <i class="iconfont icon-gengduo" @click="$router.push({path:'/Complaints',query:{shop_id:_data.liveInfo.shop_id,shop_name:_data.liveInfo.shop_name,open_id:openid}})"></i>
-      <i class="iconfont icon-fanhui1" @click="isShare=true"></i>
+      <i class="iconfont icon-fanhui1" @click="Share()"></i>
       <i @click="likeFun" class="iconfont icon-aixin1" :class="liveInfo.has_like==0?'':'active'"></i>
-      <span @click="likeFun" class="likePeople">{{liveInfo.like_count}}</span>
+      <span @click="likeFun" class="likePeople" :class="liveInfo.has_like==0?'':'active'">{{liveInfo.like_count}}</span>
     </div>
     <div class="shop" :class="isShop?'isShop':''" style="overflow-y:hidden">
       <div>
@@ -193,13 +186,11 @@
         </div>
       </div>
     </div>
-    <div class="Share" v-if="isShare">
-    	<div>
-    		<span class="iconfont icon-fork" @click="isShare=false"></span>
-    		<i class="iconfont icon-jiantou_youshang"></i>
+    <transition  enter-active-class='animated bounceIn'>
+    	<div class="Share" v-if="isShare">
+    		<span>点击右上角进行分享</span>
     	</div>
-    	<p>点击右上角分享给朋友</p>
-    </div>
+    </transition>
     <div class="button" @click="play()" v-if="isPlay">
     	<i class="iconfont icon-bofang1"></i>
     </div>
@@ -239,9 +230,30 @@ export default {
       has_collect:0
     };
   },
+ 	created(){
+ 		
+// 		var url = window.location.href.split("?")[1].split("&");
+// 		console.log(url);
+// 		for(let i=0;i<url.length;i++){
+// 			if(url[i].split("=")[0]=="play_id"){
+// 				this.play_id = url[i].split("=")[1]
+// 			}
+//			
+// 		}
+
+ 	},
   components:{
   },
   methods: {
+  	Share(){
+  		this.isShare = true;
+  		setTimeout(()=>{
+  			this.isShare = false;
+  		},1000)
+  	},
+  	close(){
+			window.close();
+  	},
     getSize() {
       var width = document.body.offsetWidth;
       var height = document.body.offsetHeight;
@@ -353,7 +365,7 @@ export default {
             } else {
               nowFlowState = 0;
             }
-            that._data.liveInfo.nowFlowState = nowFlowState;
+            that._data.liveInfo.has_flow  = nowFlowState;
           } else {
             alert(res.data.msg);
           }
@@ -568,15 +580,27 @@ export default {
         });
     },
     jump(shop_id){
-    	window.location.href = 'http://wechattest.poso2o.com/wxshop/shop_template/index_13824597674.jsp?shop_id='+shop_id+'&app_from=live_h5';
+    	window.location.href = 'http://wechattest.poso2o.com/wxshop/shop_template/index_13824597674.jsp?shop_id='+shop_id+'&app_from=live_h5&active=1';
     },
     play(){
     	document.getElementById("video").play();
+    	document.querySelector(".live").style.background = "black";
     	this.isPlay = false;
+    	
     }
     
   },
   mounted() {
+  	this.$require.get("http://BuyersManage.htm?Act=info",{
+  		params:{
+  			shop_id:this.shop_id
+  		}
+  	}).then(res=>{
+  		console.log(res);
+  	}).catch(err=>{
+  		console.log(err);
+  	})
+  	
     let that = this;
     that.getSize();
     that.$require
@@ -657,31 +681,6 @@ export default {
             that.$refs.chatBox.scrollTop = msgList.length * 100;
           }, 100);
         }
-        var netType = getNetType(),
-       platformType = getPlatformType();
- 
-   			if(netType == 'WIFI'){
-       		if(platformType != 'wechat'){
-　　　　　　　		document.getElementById('video').play();//非微信内没有限制，直接触发播放视频
-　　　　			}
-　　　　			wx.ready(function(){//微信内，必须需要等到wx jsapi加载完成之后才能执行播放视频的动作
-           	document.getElementById('video').play();
-　　　　　　			//为防止开播失败，尝试在8s内不断请求开播
-           	var myVid=document.getElementById("video");
-           	var _now_time = Date.now();
- 
-           	var play_interval = setInterval(function(){
-               var _new_time = Date.now();
-               if(_new_time - _now_time < 8000 && myVid.played.length == 1){
-                   document.getElementById('video').play();
-                   clearInterval(play_interval);
-               }
-               if(_new_time - _now_time >= 8000){
-                   clearInterval(play_interval);
-               }
-           	},200);
-       		})
-				}
       })
       .catch(err => {
         console.log(err);
@@ -711,30 +710,20 @@ export default {
 	}
 }
 .Share{
-	width: 100%;
-	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100vw;
+	height: 100vh;
 	position: absolute;
 	top: 0;
 	left: 0;
 	z-index: 120;
-	color: white;
-	background:rgba(0,0,0,0.4);
-	>div{
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		>span{
-			margin-left: 5vw;
-			font-size: 36px;
-		}
-		>i{
-			font-size: 120px;
-		}
-	}
-	>p{
-		margin-top: 5vh;
-		text-align: center;
-		font-size: 24px;
+	>span{
+		padding: 1vh 2vw;
+		border-radius:1vw ;
+		color: white;
+		background:rgba(0,0,0,0.8);
 	}
 }
 .video-js{
@@ -1034,6 +1023,7 @@ textarea:-ms-input-placeholder {
 .live {
   width: 100%;
   height: 100%;
+  background: linear-gradient(top left,rgba(255,0,0,0.6),rgba(0,0,255,0.6));
   video {
     height: 100%;
   }
@@ -1069,11 +1059,18 @@ textarea:-ms-input-placeholder {
   }
   > div:nth-of-type(2) {
     > span {
+    	display: inline-block;
+    	width: 16vw;
+    	height: 4vh;
+    	text-align: center;
+    	line-height: 4vh;
       background: #ff2851;
       font-size: 12px;
-      padding: 1vh 2vw;
       border-radius: 4vw;
       box-sizing: border-box;
+      >i{
+      	font-size: 14px;
+      }
     }
   }
   > i {
@@ -1187,10 +1184,12 @@ textarea:-ms-input-placeholder {
       }
     }
     > div:nth-of-type(2) {
+    	width:33vw;
+    	overflow: hidden;
       padding: 2vw;
       box-sizing: border-box;
       > p {
-        font-size: 14px;
+        font-size: 12px;
       }
       > span {
         font-size: 12px;
@@ -1230,12 +1229,20 @@ textarea:-ms-input-placeholder {
   bottom: 0.55rem;
   background-color: #ff2851;
   color: white;
-  padding: 0.02rem 0.08rem;
-  border-radius: 1000rem;
+  width: 4vw;
+  height: 4vw;
+  box-sizing: border-box;
+	text-align: center;
+	line-height: 4vw;
+  border-radius:50%;
   font-size: 0.2rem;
 }
+.likePeople.active{
+	/*background:#007AFF;
+	color:#FFFFFF ;*/
+}
 .iconfont.icon-aixin1.active {
-  color: #ff2851;
+  color: #00BFFF;
 }
 
 .commodity > div .commodity_sel .active {
